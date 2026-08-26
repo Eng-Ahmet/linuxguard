@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-//go:embed web/*
+//go:embed web
 var embeddedWebFS embed.FS
 
 type Server struct {
@@ -48,10 +48,9 @@ func NewServer(host string, port int, deps *ServerDependencies) (*Server, error)
 
 	addr := net.JoinHostPort(host, strconv.Itoa(port))
 	httpServer := &http.Server{
-		Addr:         addr,
-		Handler:      mux,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		Addr:              addr,
+		Handler:           mux,
+		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	return &Server{

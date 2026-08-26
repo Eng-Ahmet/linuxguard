@@ -10,13 +10,13 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 cd "${PROJECT_DIR}"
 
-echo "[1/4] Building Docker Container Image (linuxguard:latest)..."
-docker build -t linuxguard:latest .
+echo "[1/4] Building Docker Container Image (no-cache)..."
+docker build --no-cache -t linuxguard:latest .
 
 echo "[2/4] Stopping any existing demo container..."
 docker rm -f linuxguard-demo 2>/dev/null || true
 
-echo "[3/4] Starting LinuxGuard container on free port 9876..."
+echo "[3/4] Starting LinuxGuard container on port 9876..."
 docker run -d \
   --name linuxguard-demo \
   -p 9876:9876 \
@@ -24,8 +24,7 @@ docker run -d \
   --cap-add=DAC_READ_SEARCH \
   --cap-add=SYS_PTRACE \
   -v "${PROJECT_DIR}/testdata:/app/testdata" \
-  -v "${PROJECT_DIR}:/app/data" \
-  linuxguard:latest --config /app/configs/linuxguard.example.yaml
+  linuxguard:latest --config /etc/linuxguard/config.yaml
 
 echo "[4/4] Waiting 2 seconds for agent initialization..."
 sleep 2
