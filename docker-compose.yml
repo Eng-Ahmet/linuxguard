@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  linuxguard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: linuxguard-agent
+    restart: unless-stopped
+    pid: "host"
+    network_mode: "host"
+    cap_add:
+      - SYS_PTRACE
+      - DAC_READ_SEARCH
+    volumes:
+      # Host System Volume Mappings for Monitoring
+      - /etc:/host/etc:ro
+      - /usr/local/bin:/host/usr/local/bin:ro
+      - /opt:/host/opt:ro
+      - /var/lib/linuxguard:/var/lib/linuxguard
+      - ./configs/linuxguard.example.yaml:/etc/linuxguard/config.yaml:ro
+    environment:
+      - TZ=UTC

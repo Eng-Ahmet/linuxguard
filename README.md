@@ -2,6 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go Version](https://img.shields.io/badge/Go-1.23%20%7C%201.25%20%7C%201.26-00ADD8.svg)](https://golang.org/)
+[![Docker Supported](https://img.shields.io/badge/Docker-Supported-blue.svg?logo=docker)](https://www.docker.com/)
 
 > **Disclaimer**: LinuxGuard is a host-based security monitoring tool, not a replacement for a commercial antivirus, EDR, firewall, or SIEM.
 
@@ -9,79 +10,62 @@ LinuxGuard is a lightweight, modular, host-based security monitoring agent built
 
 ---
 
-## Supported Environments & Tested Go Versions
+## 🌐 How to Access the Web Dashboard
 
-* **Operating System**: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS (x86_64 / amd64)
-* **Tested Go Toolchain Versions**:
-  - `go1.23.0 linux/amd64`
-  - `go1.25.0 linux/amd64`
-  - `go1.26.7 linux/amd64`
-* **Database**: `modernc.org/sqlite` (100% CGO-Free SQLite WAL implementation)
-* **License**: Apache License 2.0 (`LICENSE`)
+Once LinuxGuard is running (natively, via Docker, or via systemd), open your web browser and navigate to:
 
----
+👉 **`http://127.0.0.1:8080`**  
+👉 **`http://localhost:8080`**
 
-## Key Features
+### Dashboard Main Sections
 
-* **Event-Driven Filesystem Monitoring**: Monitors `CREATE`, `WRITE`, `REMOVE`, `RENAME`, and `CHMOD` filesystem events using `fsnotify` with bounded directory watching and symlink protection.
-* **Streaming SHA-256 Hashing**: Calculates file hashes using memory-efficient streaming without loading entire files into memory.
-* **Integrity Baseline**: Baseline snapshot creation (`linuxguard baseline create`) and integrity drift checking (`linuxguard baseline check`) detecting modified, new, deleted, or re-permissioned system files.
-* **Lightweight Process Monitoring**: Snapshot collector inspecting `/proc` PIDs, command lines, users, execution paths, and parent PIDs to emit `PROCESS_STARTED` events.
-* **Rule-Based Threat Scoring**: Modular detection rules (`SuspiciousTmpExecutableRule`, `SensitiveFileModificationRule`, `HiddenExecutableRule`, `RootUnusualExecutableRule`, `SuspiciousPermissionRule`) accumulating threat scores (`0-100`) and categorizing risk levels (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).
-* **Hardened Quarantine Pipeline**: Secure file isolation pipeline validating paths, stripping permissions (`0400`), enforcing SHA-256 checksum verification on isolate/restore operations, and guarding against symlink/path traversal attacks.
-* **Real-Time Web Dashboard**: Built-in dark-mode HTML/CSS/Vanilla JS interface served directly by Go (`//go:embed`) with live WebSocket event streaming (`/ws/events`).
-* **Persistent SQLite Storage**: Embedded WAL-mode SQLite database (`modernc.org/sqlite`) for persistent security logs and quarantine metadata.
-* **Production Ready**: Linux `systemd` integration with hardening directives, non-root local development support, and an automated installer/uninstaller script suite.
+1. **Security Overview**: Real-time System Risk Level (`LOW`, `MEDIUM`, `HIGH`), Critical Threat Counter, Recent Activity Table, and Host System Diagnostics.
+2. **Security Events Log**: Real-time event stream (`FILE_CREATED`, `FILE_MODIFIED`, `FILE_DELETED`, `PROCESS_STARTED`).
+3. **Detected Threats**: Rule-based findings with calculated risk scores and direct **Quarantine Action** buttons.
+4. **Active Processes**: Live PID listing with user execution paths and command lines.
+5. **Quarantine Vault**: Isolated files table with **Restore** (SHA-256 verified) and **Delete** actions.
+6. **System Status**: Host diagnostic details (Hostname, OS Kernel, CPU Cores, Memory Usage, Uptime).
 
 ---
 
-## Architecture Overview
+## 🐳 Container & Docker Deployment
 
-```text
-Linux Kernel / OS
- │
- ├── File Events (fsnotify) ─────┐
- │                               │
- └── Process Snapshots (/proc) ──┴──> Event Manager (PubSub)
-                                           │
-                                           ▼
-                                    Detection Engine
-                                           │
-                           ┌───────────────┴───────────────┐
-                           ▼                               ▼
-                    SQLite Database                 Threat Event
-                           │                               │
-                   ┌───────┴───────┐               ┌───────┴───────┐
-                   ▼               ▼               ▼               ▼
-               REST API       Baseline Check   Dashboard (WS)  Quarantine Vault
+LinuxGuard fully supports containerized execution while maintaining host-level system security monitoring.
+
+### Option A: Using Docker Demo Script
+
+We provide a dedicated automated script to build, deploy, and verify the containerized agent:
+
+```bash
+./scripts/docker_demo.sh
 ```
 
----
+Then visit **`http://127.0.0.1:8080`** in your browser.
 
-## File & Package Responsibilities
+### Option B: Using Docker Compose
 
-```text
-linuxguard/
-├── cmd/linuxguard/main.go        # CLI Entry point & subcommand handler
-├── internal/
-│   ├── agent/agent.go            # Agent Central Orchestrator & Signal Handler
-│   ├── config/config.go          # YAML Configuration parser with safe fallbacks
-│   ├── database/database.go      # SQLite WAL Connection & Table CRUD operations
-│   ├── events/manager.go         # Thread-safe pub/sub Event Manager
-│   ├── filesystem/monitor.go     # fsnotify Directory Watcher & Scanner
-│   ├── filesystem/baseline.go    # Baseline snapshot & comparison engine
-│   ├── processes/monitor.go      # /proc Process snapshot collector & diff engine
-│   ├── detection/engine.go       # Modular Security Rule Engine & Scoring
-│   ├── quarantine/manager.go     # Hardened Quarantine isolation vault
-│   ├── system/system.go          # Host System Diagnostics (CPU, RAM, Uptime)
-│   └── api/server.go             # Embedded Web Server (//go:embed web/*) & WS Hub
+Launch LinuxGuard using `docker-compose` with host-monitoring capabilities enabled:
+
+```bash
+# Build and start container
+docker-compose up -d
+
+# View container logs
+docker-compose logs -f
 ```
 
+### Host-Level Security Monitoring Flags Explained
+
+To allow LinuxGuard inside Docker to monitor the underlying Linux host system:
+* `--pid=host`: Enables container visibility into host system processes (`/proc`).
+* `network_mode: "host"`: Binds the API and WebSocket server directly to host port `8080`.
+* `cap_add: [SYS_PTRACE, DAC_READ_SEARCH]`: Grants essential process inspection capabilities without requiring uninhibited root container access.
+
 ---
 
-## Quick Production Install (Ubuntu Server)
+## Quick Production Install (Native Ubuntu Systemd)
 
-To build, configure, and install LinuxGuard as a systemd service:
+To build, configure, and install LinuxGuard natively as a systemd service:
 
 ```bash
 git clone https://github.com/linuxguard/linuxguard.git
@@ -95,13 +79,25 @@ Verify service status:
 systemctl status linuxguard.service
 ```
 
-Access the local Web Dashboard at **`http://127.0.0.1:8080`**.
+Access the Web Dashboard at **`http://127.0.0.1:8080`**.
 
-### Uninstalling
+### Uninstalling Native Service
 
 ```bash
 sudo ./scripts/uninstall.sh
 ```
+
+---
+
+## Supported Environments & Tested Go Versions
+
+* **Operating System**: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS (x86_64 / amd64)
+* **Tested Go Toolchain Versions**:
+  - `go1.23.0 linux/amd64`
+  - `go1.25.0 linux/amd64`
+  - `go1.26.7 linux/amd64`
+* **Database**: `modernc.org/sqlite` (100% CGO-Free SQLite WAL implementation)
+* **License**: Apache License 2.0 (`LICENSE`)
 
 ---
 
@@ -134,9 +130,9 @@ go vet ./...
 
 ---
 
-## CLI Usage
+## CLI Usage Reference
 
-LinuxGuard includes a powerful CLI utility:
+LinuxGuard includes a CLI utility:
 
 ```bash
 # Start daemon agent
