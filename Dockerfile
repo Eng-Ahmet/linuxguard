@@ -1,5 +1,5 @@
 # Build Stage
-FROM golang:1.23-alpine AS builder
+FROM golang:alpine AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ COPY --from=builder /app/linuxguard /usr/local/bin/linuxguard
 COPY --from=builder /app/configs/linuxguard.example.yaml /etc/linuxguard/config.yaml
 
 # Expose default HTTP/WebSocket Dashboard port
-EXPOSE 8080
+EXPOSE 9876
 
 ENTRYPOINT ["/usr/local/bin/linuxguard"]
 CMD ["--config", "/etc/linuxguard/config.yaml"]

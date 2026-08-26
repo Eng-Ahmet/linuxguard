@@ -16,23 +16,23 @@ docker build -t linuxguard:latest .
 echo "[2/4] Stopping any existing demo container..."
 docker rm -f linuxguard-demo 2>/dev/null || true
 
-echo "[3/4] Starting LinuxGuard container in host-monitoring mode..."
+echo "[3/4] Starting LinuxGuard container on free port 9876..."
 docker run -d \
   --name linuxguard-demo \
+  -p 9876:9876 \
   --pid=host \
-  --net=host \
   --cap-add=DAC_READ_SEARCH \
   --cap-add=SYS_PTRACE \
   -v "${PROJECT_DIR}/testdata:/app/testdata" \
-  -v "${PROJECT_DIR}/linuxguard.db:/var/lib/linuxguard/linuxguard.db" \
-  linuxguard:latest
+  -v "${PROJECT_DIR}:/app/data" \
+  linuxguard:latest --config /app/configs/linuxguard.example.yaml
 
 echo "[4/4] Waiting 2 seconds for agent initialization..."
 sleep 2
 
-# Verify health
-echo "[+] Checking container health check API..."
-curl -s http://127.0.0.1:8080/api/health || true
+# Verify container logs
+echo "[+] Docker Container Logs:"
+docker logs linuxguard-demo
 
 echo ""
 echo "=========================================================="
@@ -41,8 +41,8 @@ echo "=========================================================="
 echo ""
 echo "  🌐 ACCESS FRONTEND DASHBOARD:"
 echo "     Open your browser and navigate to:"
-echo "     👉 http://127.0.0.1:8080"
-echo "     👉 http://localhost:8080"
+echo "     👉 http://127.0.0.1:9876"
+echo "     👉 http://localhost:9876"
 echo ""
 echo "  🔍 CONTAINER COMMANDS:"
 echo "     View container logs  : docker logs -f linuxguard-demo"

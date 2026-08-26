@@ -136,8 +136,8 @@ type Rule interface {
 
 Access the Web Dashboard served directly by the embedded Go HTTP server:
 
-👉 **`http://127.0.0.1:8080`**  
-👉 **`http://localhost:8080`**
+👉 **`http://127.0.0.1:9876`**  
+👉 **`http://localhost:9876`**
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -166,7 +166,7 @@ Run our automated build and test script:
 ./scripts/docker_demo.sh
 ```
 
-Then visit **`http://127.0.0.1:8080`** in your browser.
+Then visit **`http://127.0.0.1:9876`** in your browser.
 
 ### Option B: Docker Compose
 
@@ -180,7 +180,7 @@ docker-compose logs -f
 
 ### Host Monitoring Container Flags:
 * `--pid=host`: Gives container visibility into host system PIDs (`/proc`).
-* `network_mode: "host"`: Binds API and WebSocket directly to host port `8080`.
+* `network_mode: "host"`: Binds API and WebSocket directly to host port `9876`.
 * `cap_add: [SYS_PTRACE, DAC_READ_SEARCH]`: Enables process inspection without uninhibited root access.
 
 ---
@@ -218,7 +218,7 @@ linuxguard/
 ```yaml
 server:
   host: "127.0.0.1"    # Loopback binding for security
-  port: 8080
+  port: 9876
 
 database:
   path: "/var/lib/linuxguard/linuxguard.db"

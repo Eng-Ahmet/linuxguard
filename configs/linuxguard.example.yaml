@@ -1,16 +1,13 @@
 server:
-  host: "127.0.0.1"
-  port: 8080
+  host: "0.0.0.0"
+  port: 9876
 
 database:
-  path: "/var/lib/linuxguard/linuxguard.db"
+  path: "./linuxguard.db"
 
 monitoring:
   paths:
-    - "/etc"
-    - "/usr/local/bin"
-    - "/opt"
-    - "/var/www"
+    - "./testdata"
   excluded_paths:
     - "/proc"
     - "/sys"
@@ -23,7 +20,7 @@ process_monitor:
 
 quarantine:
   enabled: true
-  path: "/var/lib/linuxguard/quarantine"
+  path: "./quarantine"
 
 detection:
   enabled: true
