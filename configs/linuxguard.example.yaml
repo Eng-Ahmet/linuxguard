@@ -1,0 +1,36 @@
+server:
+  host: "127.0.0.1"
+  port: 8080
+
+database:
+  path: "/var/lib/linuxguard/linuxguard.db"
+
+monitoring:
+  paths:
+    - "/etc"
+    - "/usr/local/bin"
+    - "/opt"
+    - "/var/www"
+  excluded_paths:
+    - "/proc"
+    - "/sys"
+    - "/dev"
+    - "/run"
+
+process_monitor:
+  enabled: true
+  interval_seconds: 3
+
+quarantine:
+  enabled: true
+  path: "/var/lib/linuxguard/quarantine"
+
+detection:
+  enabled: true
+  suspicious_extensions:
+    - ".sh"
+    - ".bin"
+    - ".elf"
+    - ".py"
+    - ".pl"
+    - ".so"
