@@ -1,16 +1,23 @@
 # LinuxGuard — Lightweight Linux Security Monitor
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Go Version](https://img.shields.io/badge/Go-1.23%20%7C%201.25%20%7C%201.26-00ADD8.svg)](https://golang.org/)
+
 > **Disclaimer**: LinuxGuard is a host-based security monitoring tool, not a replacement for a commercial antivirus, EDR, firewall, or SIEM.
 
 LinuxGuard is a lightweight, modular, host-based security monitoring agent built in pure Go for Ubuntu/Linux servers. It monitors filesystem integrity, tracks running processes, calculates streaming SHA-256 hashes, scores threats using a modular rule engine, isolates suspicious files in a safe quarantine vault, and serves a modern dark-themed Web Dashboard with real-time WebSocket event feeds.
 
 ---
 
-## Supported Environments & Dependencies
+## Supported Environments & Tested Go Versions
 
-* **Operating System**: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS (or compatible Linux)
-* **Go Version**: Tested and fully compatible with **Go 1.23.0**, **Go 1.25.0**, and **Go 1.26.0+**
+* **Operating System**: Ubuntu 20.04 LTS / 22.04 LTS / 24.04 LTS (x86_64 / amd64)
+* **Tested Go Toolchain Versions**:
+  - `go1.23.0 linux/amd64`
+  - `go1.25.0 linux/amd64`
+  - `go1.26.7 linux/amd64`
 * **Database**: `modernc.org/sqlite` (100% CGO-Free SQLite WAL implementation)
+* **License**: Apache License 2.0 (`LICENSE`)
 
 ---
 
